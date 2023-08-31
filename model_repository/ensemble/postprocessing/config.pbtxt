@@ -1,0 +1,24 @@
+name: "tokenizer"
+backend: "python"
+
+input [
+  {
+    name: "predicted_ids"
+    data_type: TYPE_INT64
+    dims: [ -1 ]
+  }
+]
+
+output [
+  {
+    name: "transcription"
+    data_type: TYPE_STRING
+    dims: [ 1 ]
+  }
+]
+
+instance_group [
+  {
+    kind: KIND_GPU
+  }
+]

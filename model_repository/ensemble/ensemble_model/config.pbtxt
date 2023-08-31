@@ -1,0 +1,70 @@
+name: "ensemble_model"
+platform: "ensemble"
+
+input [
+    {
+        name: "audio"
+        data_type: TYPE_FP32
+        dims: [ -1 ]
+    }
+]
+output [
+  {
+    name: "transcription"
+    data_type: TYPE_STRING
+    dims: [ 1 ]
+  }
+]
+ensemble_scheduling {
+    step [
+        {
+            model_name: "preprocessing"
+            model_version: 1
+            input_map {
+                key: "audio"
+                value: "audio"
+            }
+            output_map {
+                key: "input_features"
+                value: "input_features"
+            }
+        },
+        {
+            model_name: "encoder_model"
+            model_version: 1
+            input_map {
+                key: "input_features"
+                value: "input_features"
+            }
+            output_map {
+                key: "last_hidden_state"
+                value: "last_hidden_state"
+            }
+        },
+        {
+            model_name: "decoder_sequence"
+            model_version: 1
+            input_map {
+                key: "last_hidden_state"
+                value: "last_hidden_state"
+            }
+            output_map {
+                key: "predicted_ids"
+                value: "predicted_ids"
+            }
+        },
+        {
+            model_name: "postprocessing"
+            model_version: 1
+            input_map {
+                key: "predicted_ids"
+                value: "predicted_ids"
+            }
+            output_map {
+                key: "transcription"
+                value: "transcription"
+            }
+        }
+
+    ]
+}
