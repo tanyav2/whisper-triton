@@ -37,7 +37,7 @@ class TritonPythonModel:
             # Postprocessing
             transcription_str = transcription[0]
             output_tensor = pb_utils.Tensor(
-                "transcription", np.array([transcription_str], dtype=np.object)
+                "transcription", np.array([transcription_str], dtype=object)
             )
 
             # Create inference response
@@ -45,3 +45,4 @@ class TritonPythonModel:
                 output_tensors=[output_tensor]
             )
             responses.append(inference_response)
+        return responses

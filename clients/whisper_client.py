@@ -10,7 +10,7 @@ def main(model_name):
     client = httpclient.InferenceServerClient(url="localhost:8000")
 
     # Load and preprocess audio data
-    audio, sample_rate = torchaudio.load("../data/whisper/gettysburg.wav")
+    audio, sample_rate = torchaudio.load("gettysburg.wav")
     if sample_rate != 16000:
         resampler = torchaudio.transforms.Resample(
             orig_freq=sample_rate, new_freq=16000
