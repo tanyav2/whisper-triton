@@ -1,10 +1,10 @@
-name: "tokenizer"
+name: "whisper_base"
 backend: "python"
 
 input [
   {
-    name: "predicted_ids"
-    data_type: TYPE_INT64
+    name: "audio"
+    data_type: TYPE_STRING
     dims: [ -1 ]
   }
 ]

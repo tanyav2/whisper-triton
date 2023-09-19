@@ -1,26 +1,19 @@
 # Test script to run the pipeline once it has been loaded in triton
 import tritonclient.http as httpclient
 import numpy as np
-import torchaudio
 import argparse
 
 
-def main(model_name):
+def main(model_name, file_path):
     # Setting up client
     client = httpclient.InferenceServerClient(url="localhost:8000")
 
-    # Load and preprocess audio data
-    audio, sample_rate = torchaudio.load("gettysburg.wav")
-    if sample_rate != 16000:
-        resampler = torchaudio.transforms.Resample(
-            orig_freq=sample_rate, new_freq=16000
-        )
-        audio = resampler(audio)
-        audio = audio.squeeze(0)
+    buf = open(file_path, "rb").read()
+    arr = np.array([buf], dtype=np.object_)
 
     # Create input tensor
-    input_tensor = httpclient.InferInput("audio", audio.shape, datatype="FP32")
-    input_tensor.set_data_from_numpy(audio.numpy())
+    input_tensor = httpclient.InferInput("audio", arr.shape, datatype="BYTES")
+    input_tensor.set_data_from_numpy(arr)
 
     # Query the server
     response = client.infer(model_name=model_name, inputs=[input_tensor])
@@ -34,7 +27,14 @@ def main(model_name):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--model_name", default="Select between whisper_base_onnx and whisper_base"
+        "--model_name", 
+        default="whisper_base",
+        help="Name of the model to use. Default is 'whisper_base'."
+    )
+    parser.add_argument(
+        "--file",
+        required=True,
+        help="Path to the audio file to be transcribed. Acceptable formats are m4a, mp3, mp4, mpeg, mpga, wav, and webm."
     )
     args = parser.parse_args()
-    main(args.model_name)
+    main(args.model_name, args.file)
